@@ -1,0 +1,43 @@
+Files Description:
+The Titanic_AI.py file contains code to execute a machine learning algorithm on the datasets downloaded from kaggle.com,
+specifically in the titanic competition. The train.csv file is the training data. The test.csv file is the data on which
+the algorithm is run to predict results. These results are stored in TitanicSubmission.csv file which when uploaded on
+kaggle gives a score. The gender_submission.csv file is an example file to upload as submission
+
+Plan of Attack Step 1 - Data Preprocessing:
+If you look at the provided data, you will see that the passengerid column is useless in predictions since it is just ordered
+numbering from 1 onwards. Similarly, the names of the passengers do not seem to contribute towards predictions. Lastly, there is
+close to 80% missing data in the cabin column. Hence, these columns were removed from the matrix of features. For the age
+category, there was around 20% missing data so the mean of all the ages was used to fill up the missing data. It was then
+rounded off to the next highest integer since age cannot be a decimal number. There were 2 missing entries in the embarked
+section hence an assumed value of 'Q' was assigned to these two missing entries.
+
+Plan of Attack Step 2 - Encoding Categorical Data:
+The tickets column had two kinds of tickets - Tickets with just numbers and tickets with a combination of letters and numbers.
+In ships, this might indicate different decks hence it was chosen to be important. This column was classified into two
+categories - tickets with just numbers and tickets with a combination of numbers and letters. Label encoding was then applied
+to it to convert it into 0s and 1s. A similar approach was followed to convert the gender column (male and female ) into 1s
+and 0s. Lastly, the embarked category had more than two categories so one-hot encoding was applied to it so as not to interpret
+wrong meaning that would otherwise had been there if label encoding was used.
+
+Plan of Attack Step 3 - Splitting the dataset into the training and test set
+An 80-20 standard split was used to split the data into training and test set.
+
+Plan of Attack Step 4 - Feature Scale the data
+Age and fare column data was the only data that was not between -3 and +3 hence standardized feature scaling was applied to them.
+
+Plan of Attack Step 5 - Train multiple classification models on the data and pick the one with the highest accuracy
+These classification models were used - Logistic Regression, kNN, SVM, Naive Bayes and Random Forest. The confusion matrices
+were constructed for each of these and it was observed that SVM gave the highest accuracy. Hence, that was chosen to predict
+data on the test.csv file
+
+Plan of Attack Step 6 - Maximize learning
+With SVM chosen, it was now trained on 100% of the training data. Because the existing classifier was trained on only 80% of
+data hence to get better results, it needed to be trained on all of the available data.
+
+Plan of Attack Step 7 - Preprocess and encode data in the test.csv file
+Following the same steps as before, data in the test.csv file was made so it can be readily fed into the classifier.
+
+Plan of Attack Step 8 - Run the classifier on the test.csv data and get results
+The SVM classifier was now run on the test.csv data and the results were stored in the TitanicSubmission.csv file, ready for
+submission to kaggle.
