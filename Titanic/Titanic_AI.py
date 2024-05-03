@@ -24,30 +24,6 @@ y = dataset.iloc[:, 1].values
 #Names of the passengers will not help in predictions hence removing that column
 X = np.delete(X, 1, 1)
 
-#Data Preprocessing
-missing_data = dataset.isnull().sum() #Identify amount of missing data
-print(missing_data)
-#We see Age, Cabin and Embarked have missing data. Lets calculate the percentage of missing data in these categories
-missingpercentage = (100 / len(X[:, 2])) * missing_data['Age']
-missingpercentcabin = (100 / len(X[:, 7])) * missing_data['Cabin']
-missingpercentembarked = (100 / len(X[:, 8])) * missing_data['Embarked']
-print('Missing data in Age category is: ' + str(missingpercentage) + '%')
-print('Missing data in Cabin category is: ' + str(missingpercentcabin) + '%')
-print('Missing data in Embarked category is: ' + str(missingpercentembarked) + '%')
-#Since there is around 20% missing data in age, using mean of available data to replace missing data
-imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
-imputer.fit(X[:, [2]]) #Replace column 3 missing values
-X[:, [2]] = imputer.transform(X[:, [2]])
-#Since age cannot be a decimal value, rounding off to the nearest integer
-for index, val in enumerate(X[:, 2]):
-    X[index, 2] = round(val)
-#Since 77% of data is missing in cabin category, deleting that column
-X = np.delete(X, 7, 1)
-#Since just 0.2% data is missing, replace the embarked missing values with assumed value Q
-for index, val in enumerate(X[:, 7]):
-    if pd.isnull(X[index, 7]):
-        X[index, 7] = 'Q'
-
 #Exploratory Data Analysis
 dataset['Died'] = 1 - dataset['Survived']
 #Checking what significance Pclass has on survival rate
@@ -74,6 +50,41 @@ plt.hist([dataset[dataset['Survived'] == 0]['Fare']], stacked = True, bins = 50,
 plt.xlabel('Fare')
 plt.ylabel('Number of passengers')
 #From this, it is clear higher fare passengers are more likely to survive
+#Checking what significance Embarked has on survival rate
+dataset.groupby('Embarked').agg('mean')[['Survived', 'Died']].plot(kind='bar', figsize=(25, 7), stacked=True,)
+#From this bar plot, it is obvious the most survival is with embarked C, then Q then S
+#For the name column, each name has a title - Mr., Mrs., etc. Lets see how many such titles are there
+titlelist = []
+for name in dataset['Name']:
+    titlelist.append(name.split(',')[1].split('.')[0].strip())
+titlelistset = list(set(titlelist))
+titlelistarray = np.asarray(titlelist)
+#Seeing what significance these titles have on predictions
+sns.barplot(x = titlelistarray, y = np.asarray(list(range(0, len(titlelistarray)))), hue = 'Survived', data = dataset)
+
+#Data Preprocessing
+missing_data = dataset.isnull().sum() #Identify amount of missing data
+print(missing_data)
+#We see Age, Cabin and Embarked have missing data. Lets calculate the percentage of missing data in these categories
+missingpercentage = (100 / len(X[:, 2])) * missing_data['Age']
+missingpercentcabin = (100 / len(X[:, 7])) * missing_data['Cabin']
+missingpercentembarked = (100 / len(X[:, 8])) * missing_data['Embarked']
+print('Missing data in Age category is: ' + str(missingpercentage) + '%')
+print('Missing data in Cabin category is: ' + str(missingpercentcabin) + '%')
+print('Missing data in Embarked category is: ' + str(missingpercentembarked) + '%')
+#Since there is around 20% missing data in age, using mean of available data to replace missing data
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(X[:, [2]]) #Replace column 3 missing values
+X[:, [2]] = imputer.transform(X[:, [2]])
+#Since age cannot be a decimal value, rounding off to the nearest integer
+for index, val in enumerate(X[:, 2]):
+    X[index, 2] = round(val)
+#Since 77% of data is missing in cabin category, deleting that column
+X = np.delete(X, 7, 1)
+#Since just 0.2% data is missing, replace the embarked missing values with assumed value Q
+for index, val in enumerate(X[:, 7]):
+    if pd.isnull(X[index, 7]):
+        X[index, 7] = 'Q'
 
 #Encoding categorical data
 #To distinguish between male and female, use label encoding to convert these into boolean 1 and 0
