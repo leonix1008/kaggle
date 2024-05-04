@@ -331,7 +331,7 @@ X[:, [7]] = sc.fit_transform(X[:, [7]])
 classifierrffinal = SVC(kernel = 'rbf')
 classifierrffinal.fit(X, y)
 
-#Applying SVM
+#Applying Random Forest
 y_predfinal = classifierrffinal.predict(Xtest)
 
 #Convert to csv
