@@ -1,43 +1,78 @@
+RESULT - 78%
 Files Description:
 The Titanic_AI.py file contains code to execute a machine learning algorithm on the datasets downloaded from kaggle.com,
 specifically in the titanic competition. The train.csv file is the training data. The test.csv file is the data on which
 the algorithm is run to predict results. These results are stored in TitanicSubmission.csv file which when uploaded on
 kaggle gives a score. The gender_submission.csv file is an example file to upload as submission
 
-Plan of Attack Step 1 - Data Preprocessing:
-If you look at the provided data, you will see that the passengerid column is useless in predictions since it is just ordered
-numbering from 1 onwards. Similarly, the names of the passengers do not seem to contribute towards predictions. Lastly, there is
-close to 80% missing data in the cabin column. Hence, these columns were removed from the matrix of features. For the age
-category, there was around 20% missing data so the mean of all the ages was used to fill up the missing data. It was then
-rounded off to the next highest integer since age cannot be a decimal number. There were 2 missing entries in the embarked
-section hence an assumed value of 'Q' was assigned to these two missing entries.
+Plan of Attack Step 1 - Exploratory Data Analysis:
+Before we start anything, we must identify if all data given to us serve as predictors for the outcome. For this, we use
+exploratory data analysis. We take each feature and using the various plot libraries available in Python, we see the
+significance of each feature on the outcome. We also check the test data to see if there is any data that is not present
+in the training data.
+1. Pclass - Through EDA, it was found that passengers with Pclass 1 are more likely to survive than 2 and then 3.
+2. Sex - Through EDA, it was found that female passengers are more likely to survive than male passengers. This is very
+useful information because from this, we can classify females as 1 and males as 0 when we encode the categorical data into
+numbers. We need to give female passengers a higher number than male passengers.
+3. Age - Through EDA, it was found that the youngest passengers (0-5 years) of age are most likely to survive. This is in line
+with the rule on a sinking ship to save women and children first so it makes sense.
+4. SibSp - Through EDA, it was found that a higher SibSp meant low survival rate.
+5. Parch - Through EDA, it was found that a higher Parch meant low survival rate.
+6. Fare - Through EDA, it was found that a higher fare meant higher survival rate.
+7. Embarked - Through EDA, it was found that an embarked of C has the highest survival follwed by Q and lastly S. This is very
+useful information because now, similar to what we did for sex category, we can encode C as 3, Q as 2 and S as 1.
+8. Name - This is the tricky one. The name in itself is not a useful predictor however we see that each name as a title associated
+with it. It is Mr, Mrs, Miss, Don, Jonkheer, Captain, etc. Upon analyzing this through EDA, it was observed that certain titles
+had no deaths, certain titles had no survivals and others had a mix of both. This means that certain people were considered more
+important than others and hence were saved first and as sad as it may be, certain people were considered expendable. With this
+information, we can classify titles with no deaths as the highest hence 3, titles with no survivals as the lowest hence 1 and
+titles with a mix of both as 2, in the middle. We also see that the test set has one title not present in the training set. This
+title is Dona. However, Dona simply appears to be the female version of Don hence the numerical value of the Don title can be taken
+as the one for Dona and Don is present in the training data.
+9. Ticket - This is also tricky but we see that certain tickets have only numbers in them and certain ones have a combination of
+numbers and letters. By using EDA, it was observed that passengers with number only tickets had low survivals than passengers with
+tickets with numbers and letters. Hence, we can encode the former category as 0 and the latter as 1.
+10. Cabin - This category has a lot of unknown data so it will be removed.
 
-Plan of Attack Step 2 - Encoding Categorical Data:
+Now, we have a lot of useful information and we can move onto step 2.
+
+Plan of Attack Step 2 - Data Preprocessing:
+If you look at the provided data, you will see that the passengerid column is useless in predictions since it is just ordered
+numbering from 1 onwards. Also, there is close to 80% missing data in the cabin column. Hence, these columns were removed from 
+the matrix of features. For the age category, there was around 20% missing data so the mean of all the ages was used to fill
+up the missing data. It was then rounded off to the next highest integer since age cannot be a decimal number. There were
+2 missing entries in the embarked section hence the maximum occuring value of 'S' was assigned to these two missing entries.
+
+Plan of Attack Step 3 - Encoding Categorical Data:
 The tickets column had two kinds of tickets - Tickets with just numbers and tickets with a combination of letters and numbers.
 In ships, this might indicate different decks hence it was chosen to be important. This column was classified into two
 categories - tickets with just numbers and tickets with a combination of numbers and letters. Label encoding was then applied
-to it to convert it into 0s and 1s. A similar approach was followed to convert the gender column (male and female ) into 1s
-and 0s. Lastly, the embarked category had more than two categories so one-hot encoding was applied to it so as not to interpret
-wrong meaning that would otherwise had been there if label encoding was used.
+to it to convert it into 0s and 1s as described in EDA. A similar approach was followed to convert the gender column
+(male and female ) into 1s and 0s. Lastly, the embarked category was also converted into numbers as described in EDA.
 
-Plan of Attack Step 3 - Splitting the dataset into the training and test set
+Plan of Attack Step 4 - Preprocessing and Encoding Test Data:
+Similar to what we did for the train.csv data, we follow the exact same approach to convert the data from test.csv into proper
+formatting. I prefer to do this before moving on to selecting the model because I want to get the boring stuff over with once
+and for all. Though remember that we have a Dona in the name category and it must be the same encoded number as the Don category
+in the train.csv file.
+
+Plan of Attack Step 5 - Splitting the dataset into the training and test set
 An 80-20 standard split was used to split the data into training and test set.
 
-Plan of Attack Step 4 - Feature Scale the data
+Plan of Attack Step 6 - Feature Scale the data
 Age and fare column data was the only data that was not between -3 and +3 hence standardized feature scaling was applied to them.
+The fit_transform method was used to feature scale training data but only transform method was used to feature scale test data
+to prevent information leakage. The test.csv data was feature scaled too.
 
-Plan of Attack Step 5 - Train multiple classification models on the data and pick the one with the highest accuracy
+Plan of Attack Step 7 - Train multiple classification models on the data and pick the one with the highest accuracy
 These classification models were used - Logistic Regression, kNN, SVM, Naive Bayes and Random Forest. The confusion matrices
-were constructed for each of these and it was observed that SVM gave the highest accuracy. Hence, that was chosen to predict
+were constructed for each of these and it was observed that Random Forest gave the highest accuracy. Hence, that was chosen to predict
 data on the test.csv file
 
-Plan of Attack Step 6 - Maximize learning
-With SVM chosen, it was now trained on 100% of the training data. Because the existing classifier was trained on only 80% of
+Plan of Attack Step 8 - Maximize learning
+With Random Forest chosen, it was now trained on 100% of the training data. Because the existing classifier was trained on only 80% of
 data hence to get better results, it needed to be trained on all of the available data.
 
-Plan of Attack Step 7 - Preprocess and encode data in the test.csv file
-Following the same steps as before, data in the test.csv file was made so it can be readily fed into the classifier.
-
-Plan of Attack Step 8 - Run the classifier on the test.csv data and get results
-The SVM classifier was now run on the test.csv data and the results were stored in the TitanicSubmission.csv file, ready for
-submission to kaggle.
+Plan of Attack Step 9 - Run the classifier on the test.csv data and get results
+The Random Forest classifier was now run on the test.csv data and the results were stored in the TitanicSubmission.csv file, ready for
+submission to kaggle. The result was an impressive accuracy of 78%.
