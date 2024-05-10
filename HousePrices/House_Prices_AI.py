@@ -68,15 +68,81 @@ plt.scatter(x = dataset['MiscVal'], y = dataset['SalePrice'])
 sns.barplot(x = dataset['MSZoning'], y = dataset['SalePrice'], data = dataset)
 #Based on this plot, we can label C (all) as 1, RM as 2, RH as 3, RL as 4, FV as 5
 sns.barplot(x = dataset['Street'], y = dataset['SalePrice'], data = dataset)
-#Based on this plot, Pave as 2 and Grvl as 1
+#Based on this plot, Pave as 1 and Grvl as 0
 sns.barplot(x = dataset['LotShape'], y = dataset['SalePrice'], data = dataset)
-#Based on this plot, Reg as 1, IR3 as 2, IR1 as 3 and IR2 as 4
+#Based on this plot, Reg as 0, IR3 as 1, IR1 as 1 and IR2 as 1
 sns.barplot(x = dataset['LandContour'], y = dataset['SalePrice'], data = dataset)
-#Based on this plot, Bnk as 1, Lvl and Low as 2, HLS as 3
+#Based on this plot, one-hot encoding
 sns.barplot(x = dataset['Utilities'], y = dataset['SalePrice'], data = dataset)
-#Based on this plot, AllPub as 2, NoSeWa as 1
+#Based on this plot, AllPub as 1, NoSeWa as 0
 sns.barplot(x = dataset['LotConfig'], y = dataset['SalePrice'], data = dataset)
-#Based on this plot, Inside, FR2, Corner as 1, FR3 as 2, CulDSac as 3
+#Based on this plot, one-hot encoding
+sns.barplot(x = dataset['LandSlope'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, one-hot encoding
+sns.barplot(x = dataset['Neighborhood'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, NoRidge, NridgHt, StoneBr as 1, everything else 0
+sns.barplot(x = dataset['Condition1'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, PosN, RRNn, PosA as 3, Norm, RRAn, RRNe as 2, Feedr, Artery, RRAe as 1
+sns.barplot(x = dataset['Condition2'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, PosA, PosN as 1, everything else 0
+sns.barplot(x = dataset['BldgType'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, 1Fam, TwnhsE as 1, everything else 0
+sns.barplot(x = dataset['HouseStyle'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, 2Story as 1, everythinig else 0
+sns.barplot(x = dataset['RoofStyle'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Shed as 1, everything else 0
+sns.barplot(x = dataset['RoofMatl'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, WdShake, Membran as 1, everything else 0
+sns.barplot(x = dataset['Exterior1st'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, VinylSd, CemntBd, Stone, ImStucc as 1, everything else 0
+sns.barplot(x = dataset['Exterior2nd'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Other as 1, everything else 0
+sns.barplot(x = dataset['MasVnrType'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Stone as 1, everything else 0
+sns.barplot(x = dataset['ExterQual'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Ex as 1, everything else 0
+sns.barplot(x = dataset['ExterCond'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Po, Fa as 0, everything else 1
+sns.barplot(x = dataset['Foundation'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, PConc, Wood, Stone as 1, everything else 0
+sns.barplot(x = dataset['BsmtQual'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Ex as 1, everything else 0
+sns.barplot(x = dataset['BsmtCond'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, TA, Gd as 1, everything else 0
+sns.barplot(x = dataset['BsmtExposure'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Gd as 1, everything else 0
+sns.barplot(x = dataset['BsmtFinType1'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, GLQ as 1, everything else 0
+sns.barplot(x = dataset['BsmtFinType2'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, one-hot encoding
+sns.barplot(x = dataset['Heating'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, GasA, GasW as 1, everything else 0
+sns.barplot(x = dataset['HeatingQC'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Ex as 1, everything else 0
+sns.barplot(x = dataset['CentralAir'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Y as 1, N as 0
+sns.barplot(x = dataset['Electrical'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, SBrkr as 1, everything else 0
+sns.barplot(x = dataset['KitchenQual'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Ex as 1, everything else 0
+sns.barplot(x = dataset['Functional'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Typ as 3, Maj2 as 1, everything else 2
+sns.barplot(x = dataset['FireplaceQu'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Ex as 1, everything else 0
+sns.barplot(x = dataset['GarageType'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, BuiltIn as 3, Attchd as 2, everything else 1
+sns.barplot(x = dataset['GarageFinish'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Fin as 3, RFn as 2, Unf as 0
+sns.barplot(x = dataset['GarageQual'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Gd as 3, TA as 2, everything else 1
+sns.barplot(x = dataset['GarageCond'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, TA, Gd as 1, everything else 0
+sns.barplot(x = dataset['PavedDrive'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Y as 1, everything else 0
+sns.barplot(x = dataset['SaleType'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, New, Con as 3, ConLI, CWD as 2, everything else 1
+sns.barplot(x = dataset['SaleCondition'], y = dataset['SalePrice'], data = dataset)
+#Based on this plot, Abnorml, Partial as 1, everything else 0
 #Since the data is not too large, we won't exclude any features. Reassigning X and y with the new dataset
 X = dataset.iloc[:, 1:].values
 y = dataset.iloc[:, -1].values
@@ -188,3 +254,81 @@ X = np.delete(X, 69, 1) #Fence
 X = np.delete(X, 69, 1) #MiscFeature
 
 #Encoding categorical data
+#Encode data based on what we identified in exploratory data analysis
+mszoning = []
+for data in X[:, 1]:
+    if data == 'FV':
+        mszoning.append(5)
+    elif data == 'RL':
+        mszoning.append(4)
+    elif data == 'RH':
+        mszoning.append(3)
+    elif data == 'RM':
+        mszoning.append(2)
+    else:
+        mszoning.append(1)
+X[:, 1] = np.asarray(mszoning)
+street = []
+for data in X[:, 4]:
+    if data == 'Pave':
+        street.append(1)
+    else:
+        street.append(0)
+X[:, 4] = np.asarray(street)
+lotshape = []
+for data in X[:, 5]:
+    if data == 'Reg':
+        lotshape.append(0)
+    else:
+        lotshape.append(1)
+X[:, 5] = np.asarray(lotshape)
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [6])], remainder = 'passthrough', sparse_threshold = 0)
+X = np.array(ct.fit_transform(X))
+utilities = []
+for data in X[:, 7]:
+    if data == 'AllPub':
+        utilities.append(1)
+    else:
+        utilities.append(0)
+X[:, 7] = np.asarray(utilities)
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [8])], remainder = 'passthrough', sparse_threshold = 0)
+X = np.array(ct.fit_transform(X))
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [9])], remainder = 'passthrough', sparse_threshold = 0)
+X = np.array(ct.fit_transform(X))
+neighborhood = []
+for data in X[:, 10]:
+    if data == 'NoRidge' or data == 'NridgHt' or data == 'StoneBr':
+        neighborhood.append(1)
+    else:
+        neighborhood.append(0)
+X[:, 10] = np.asarray(neighborhood)
+condition1 = []
+for data in X[:, 11]:
+    if data == 'PosN' or data == 'RRNn' or data == 'PosA':
+        condition1.append(3)
+    elif data == 'Norm' or data == 'RRAn' or data == 'RRNe':
+        condition1.append(2)
+    else:
+        condition1.append(1)
+X[:, 11] = np.asarray(condition1)
+condition2 = []
+for data in X[:, 12]:
+    if data == 'PosA' or data == 'PosN':
+        condition2.append(1)
+    else:
+        condition2.append(0)
+X[:, 12] = np.asarray(condition2)
+bldgtype = []
+for data in X[:, 13]:
+    if data == '1Fam' or data == 'TwnhsE':
+        bldgtype.append(1)
+    else:
+        bldgtype.append(0)
+X[:, 13] = np.asarray(bldgtype)
+housestyle = []
+for data in X[:, 14]:
+    if data == '2Story':
+        housestyle.append(1)
+    else:
+        housestyle.append(0)
+X[:, 14] = np.asarray(housestyle)
