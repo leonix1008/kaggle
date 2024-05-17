@@ -20,10 +20,9 @@ from scipy import stats
 #Importing the dataset
 dataset = pd.read_csv('train.csv')
 datasettest = pd.read_csv('test.csv')
-#Ignoring the passenger id column since a simple numbering is not helpful in predicting data
-X = dataset.iloc[:, 1:-1].values
+X = dataset.iloc[:, :-1].values
 y = dataset.iloc[:, -1].values
-Xtest = datasettest.iloc[:, 1:].values
+Xtest = datasettest.iloc[:, :].values
 #Converting False to 0 and True to 1 for easier exploratory data exploration
 ylist = []
 for val in y:
@@ -36,6 +35,12 @@ dataset['Transported'] = y
 
 #Exploratory Data Analysis
 dataset['NotTransported'] = 1 - dataset['Transported']
+#For passenger id, last digit seems relevant
+pasid = []
+for val in dataset['PassengerId']:
+    pasid.append(val[-1])
+pasidarr = np.asarray(pasid)
+sns.barplot(x = pasidarr, y = np.asarray(list(range(0, len(pasidarr)))), hue = 'Transported', data = dataset)
 #Checking what significance HomePlanet has on outcome
 dataset.groupby('HomePlanet').agg('mean')[['Transported', 'NotTransported']].plot(kind='bar', figsize=(25, 7), stacked=True,)
 #Based on this, can assign Europa as 3, Mars as 2, Earth as 1
@@ -75,35 +80,32 @@ namelistarr = np.asarray(namelist)
 #Data Preprocessing
 missing_data = dataset.isnull().sum() #Identify amount of missing data
 #Handling the missing data through various techniques
-print(stats.mode(X[:, 0]))
-for index, val in enumerate(X[:, 0]):
-    if pd.isnull(X[index, 0]):
-        X[index, 0] = 'Earth'
 print(stats.mode(X[:, 1]))
 for index, val in enumerate(X[:, 1]):
     if pd.isnull(X[index, 1]):
-        X[index, 1] = False
-#For cabin, only port or starboard is important so using porsarr as variable
-print(stats.mode(porsarr))
+        X[index, 1] = 'Earth'
+print(stats.mode(X[:, 2]))
 for index, val in enumerate(X[:, 2]):
     if pd.isnull(X[index, 2]):
-        X[index, 2] = 'S'
-print(stats.mode(X[:, 3]))
+        X[index, 2] = False
+#For cabin, only port or starboard is important so using porsarr as variable
+print(stats.mode(porsarr))
 for index, val in enumerate(X[:, 3]):
     if pd.isnull(X[index, 3]):
-        X[index, 3] = 'TRAPPIST-1e'
-imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
-imputer.fit(X[:, [4]])
-X[:, [4]] = imputer.transform(X[:, [4]])
+        X[index, 3] = 'S'
+print(stats.mode(X[:, 4]))
 for index, val in enumerate(X[:, 4]):
-    X[index, 4] = round(val)
-print(stats.mode(X[:, 5]))
-for index, val in enumerate(X[:, 5]):
-    if pd.isnull(X[index, 5]):
-        X[index, 5] = False
+    if pd.isnull(X[index, 4]):
+        X[index, 4] = 'TRAPPIST-1e'
 imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
-imputer.fit(X[:, [6]])
-X[:, [6]] = imputer.transform(X[:, [6]])
+imputer.fit(X[:, [5]])
+X[:, [5]] = imputer.transform(X[:, [5]])
+for index, val in enumerate(X[:, 5]):
+    X[index, 5] = round(val)
+print(stats.mode(X[:, 6]))
+for index, val in enumerate(X[:, 6]):
+    if pd.isnull(X[index, 6]):
+        X[index, 6] = False
 imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
 imputer.fit(X[:, [7]])
 X[:, [7]] = imputer.transform(X[:, [7]])
@@ -116,50 +118,57 @@ X[:, [9]] = imputer.transform(X[:, [9]])
 imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
 imputer.fit(X[:, [10]])
 X[:, [10]] = imputer.transform(X[:, [10]])
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(X[:, [11]])
+X[:, [11]] = imputer.transform(X[:, [11]])
 #Deleting name column as it was identified it wont be useful in prediction
-X = np.delete(X, 11, 1)
+X = np.delete(X, 12, 1)
 
 #Encoding categorical data
 #Encoding categorical data via identified techniques in EDA
-planet = []
+pasid = []
 for val in X[:, 0]:
+    pasid.append(int(val[-1]))
+X[:, 0] = np.asarray(pasid)
+planet = []
+for val in X[:, 1]:
     if val == 'Europa':
         planet.append(3)
     elif val == 'Mars':
         planet.append(2)
     else:
         planet.append(1)
-X[:, 0] = np.asarray(planet)
+X[:, 1] = np.asarray(planet)
 cryo = []
-for val in X[:, 1]:
+for val in X[:, 2]:
     if val == True:
         cryo.append(1)
     else:
         cryo.append(0)
-X[:, 1] = np.asarray(cryo)
+X[:, 2] = np.asarray(cryo)
 pors = []
-for val in X[:, 2]:
+for val in X[:, 3]:
     if type(val) is str:
         pors.append(val[-1])
     else:
         pors.append('nan')
-X[:, 2] = np.asarray(pors)
-ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [2])], remainder = 'passthrough', sparse_threshold = 0)
+X[:, 3] = np.asarray(pors)
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [3])], remainder = 'passthrough', sparse_threshold = 0)
 X = np.array(ct.fit_transform(X))
 destination = []
-for val in X[:, 4]:
+for val in X[:, 5]:
     if val == '55 Cancri e':
         destination.append(1)
     else:
         destination.append(0)
-X[:, 4] = np.asarray(destination)
+X[:, 5] = np.asarray(destination)
 vip = []
-for val in X[:, 6]:
+for val in X[:, 7]:
     if val == False:
         vip.append(1)
     else:
         vip.append(0)
-X[:, 6] = np.asarray(vip)
+X[:, 7] = np.asarray(vip)
 #Verifying if we have any missing data still
 print(np.isnan(np.min(X)))
 #The answer is no
@@ -167,35 +176,32 @@ print(np.isnan(np.min(X)))
 #Now making sure our test data is also in a proper format by following similar approaches
 missing_data = datasettest.isnull().sum() #Identify amount of missing data
 #Handling the missing data through various techniques
-print(stats.mode(Xtest[:, 0]))
-for index, val in enumerate(Xtest[:, 0]):
-    if pd.isnull(Xtest[index, 0]):
-        Xtest[index, 0] = 'Earth'
 print(stats.mode(Xtest[:, 1]))
 for index, val in enumerate(Xtest[:, 1]):
     if pd.isnull(Xtest[index, 1]):
-        Xtest[index, 1] = False
-#For cabin, only port or starboard is important so using porsarr as variable
-print(stats.mode(porsarr))
+        Xtest[index, 1] = 'Earth'
+print(stats.mode(Xtest[:, 2]))
 for index, val in enumerate(Xtest[:, 2]):
     if pd.isnull(Xtest[index, 2]):
-        Xtest[index, 2] = 'S'
-print(stats.mode(Xtest[:, 3]))
+        Xtest[index, 2] = False
+#For cabin, only port or starboard is important so using porsarr as variable
+print(stats.mode(porsarr))
 for index, val in enumerate(Xtest[:, 3]):
     if pd.isnull(Xtest[index, 3]):
-        Xtest[index, 3] = 'TRAPPIST-1e'
-imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
-imputer.fit(Xtest[:, [4]])
-Xtest[:, [4]] = imputer.transform(Xtest[:, [4]])
+        Xtest[index, 3] = 'S'
+print(stats.mode(Xtest[:, 4]))
 for index, val in enumerate(Xtest[:, 4]):
-    Xtest[index, 4] = round(val)
-print(stats.mode(Xtest[:, 5]))
-for index, val in enumerate(Xtest[:, 5]):
-    if pd.isnull(Xtest[index, 5]):
-        Xtest[index, 5] = False
+    if pd.isnull(Xtest[index, 4]):
+        Xtest[index, 4] = 'TRAPPIST-1e'
 imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
-imputer.fit(Xtest[:, [6]])
-Xtest[:, [6]] = imputer.transform(Xtest[:, [6]])
+imputer.fit(Xtest[:, [5]])
+Xtest[:, [5]] = imputer.transform(Xtest[:, [5]])
+for index, val in enumerate(Xtest[:, 5]):
+    Xtest[index, 5] = round(val)
+print(stats.mode(Xtest[:, 6]))
+for index, val in enumerate(Xtest[:, 6]):
+    if pd.isnull(Xtest[index, 6]):
+        Xtest[index, 6] = False
 imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
 imputer.fit(Xtest[:, [7]])
 Xtest[:, [7]] = imputer.transform(Xtest[:, [7]])
@@ -208,50 +214,57 @@ Xtest[:, [9]] = imputer.transform(Xtest[:, [9]])
 imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
 imputer.fit(Xtest[:, [10]])
 Xtest[:, [10]] = imputer.transform(Xtest[:, [10]])
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(Xtest[:, [11]])
+Xtest[:, [11]] = imputer.transform(Xtest[:, [11]])
 #Deleting name column as it was identified it wont be useful in prediction
-Xtest = np.delete(Xtest, 11, 1)
+Xtest = np.delete(Xtest, 12, 1)
 
 #Encoding categorical data
 #Encoding categorical data via identified techniques in EDA
-planet = []
+pasid = []
 for val in Xtest[:, 0]:
+    pasid.append(int(val[-1]))
+Xtest[:, 0] = np.asarray(pasid)
+planet = []
+for val in Xtest[:, 1]:
     if val == 'Europa':
         planet.append(3)
     elif val == 'Mars':
         planet.append(2)
     else:
         planet.append(1)
-Xtest[:, 0] = np.asarray(planet)
+Xtest[:, 1] = np.asarray(planet)
 cryo = []
-for val in Xtest[:, 1]:
+for val in Xtest[:, 2]:
     if val == True:
         cryo.append(1)
     else:
         cryo.append(0)
-Xtest[:, 1] = np.asarray(cryo)
+Xtest[:, 2] = np.asarray(cryo)
 pors = []
-for val in Xtest[:, 2]:
+for val in Xtest[:, 3]:
     if type(val) is str:
         pors.append(val[-1])
     else:
         pors.append('nan')
-Xtest[:, 2] = np.asarray(pors)
-ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [2])], remainder = 'passthrough', sparse_threshold = 0)
+Xtest[:, 3] = np.asarray(pors)
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [3])], remainder = 'passthrough', sparse_threshold = 0)
 Xtest = np.array(ct.fit_transform(Xtest))
 destination = []
-for val in Xtest[:, 4]:
+for val in Xtest[:, 5]:
     if val == '55 Cancri e':
         destination.append(1)
     else:
         destination.append(0)
-Xtest[:, 4] = np.asarray(destination)
+Xtest[:, 5] = np.asarray(destination)
 vip = []
-for val in Xtest[:, 6]:
+for val in Xtest[:, 7]:
     if val == False:
         vip.append(1)
     else:
         vip.append(0)
-Xtest[:, 6] = np.asarray(vip)
+Xtest[:, 7] = np.asarray(vip)
 #Verifying if we have any missing data still
 print(np.isnan(np.min(Xtest)))
 #The answer is no
@@ -261,27 +274,30 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
 
 #Feature Scaling
 sc = StandardScaler() #Applying feature scaling
-X_train[:, [2]] = sc.fit_transform(X_train[:, [2]])
-X_train[:, [5]] = sc.fit_transform(X_train[:, [5]])
-X_train[:, [7]] = sc.fit_transform(X_train[:, [7]])
+#X_train[:, [2]] = sc.fit_transform(X_train[:, [2]])
+#X_train[:, [3]] = sc.fit_transform(X_train[:, [3]])
+X_train[:, [6]] = sc.fit_transform(X_train[:, [6]])
 X_train[:, [8]] = sc.fit_transform(X_train[:, [8]])
 X_train[:, [9]] = sc.fit_transform(X_train[:, [9]])
 X_train[:, [10]] = sc.fit_transform(X_train[:, [10]])
 X_train[:, [11]] = sc.fit_transform(X_train[:, [11]])
-X_test[:, [2]] = sc.transform(X_test[:, [2]])
-X_test[:, [5]] = sc.transform(X_test[:, [5]])
-X_test[:, [7]] = sc.transform(X_test[:, [7]])
+X_train[:, [12]] = sc.fit_transform(X_train[:, [12]])
+#X_test[:, [2]] = sc.transform(X_test[:, [2]])
+#X_test[:, [3]] = sc.transform(X_test[:, [3]])
+X_test[:, [6]] = sc.transform(X_test[:, [6]])
 X_test[:, [8]] = sc.transform(X_test[:, [8]])
 X_test[:, [9]] = sc.transform(X_test[:, [9]])
 X_test[:, [10]] = sc.transform(X_test[:, [10]])
 X_test[:, [11]] = sc.transform(X_test[:, [11]])
-Xtest[:, [2]] = sc.transform(Xtest[:, [2]])
-Xtest[:, [5]] = sc.transform(Xtest[:, [5]])
-Xtest[:, [7]] = sc.transform(Xtest[:, [7]])
+X_test[:, [12]] = sc.transform(X_test[:, [12]])
+#Xtest[:, [2]] = sc.transform(Xtest[:, [2]])
+#Xtest[:, [3]] = sc.transform(Xtest[:, [3]])
+Xtest[:, [6]] = sc.transform(Xtest[:, [6]])
 Xtest[:, [8]] = sc.transform(Xtest[:, [8]])
 Xtest[:, [9]] = sc.transform(Xtest[:, [9]])
 Xtest[:, [10]] = sc.transform(Xtest[:, [10]])
 Xtest[:, [11]] = sc.transform(Xtest[:, [11]])
+Xtest[:, [12]] = sc.transform(Xtest[:, [12]])
 
 #Applying logistic regression
 classifierlog = LogisticRegression()
@@ -349,13 +365,14 @@ print('The accuracy of SVM model is ' + str(accuracysvm) + '%')
 
 #Training the Random Forest model on the whole dataset now to maximize learning
 #Feature scaling the whole data
-X[:, [2]] = sc.fit_transform(X[:, [2]])
-X[:, [5]] = sc.fit_transform(X[:, [5]])
-X[:, [7]] = sc.fit_transform(X[:, [7]])
+#X[:, [2]] = sc.fit_transform(X[:, [2]])
+#X[:, [3]] = sc.fit_transform(X[:, [3]])
+X[:, [6]] = sc.fit_transform(X[:, [6]])
 X[:, [8]] = sc.fit_transform(X[:, [8]])
 X[:, [9]] = sc.fit_transform(X[:, [9]])
 X[:, [10]] = sc.fit_transform(X[:, [10]])
 X[:, [11]] = sc.fit_transform(X[:, [11]])
+X[:, [12]] = sc.fit_transform(X[:, [12]])
 
 classifierrffinal = SVC(kernel = 'rbf')
 classifierrffinal.fit(X, y)
