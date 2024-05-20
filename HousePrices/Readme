@@ -1,1 +1,55 @@
+RESULT - 15%
+Files Description:
+The House_Prices_AI.py file contains code to execute a machine learning algorithm on the datasets downloaded from kaggle.com,
+specifically in the house prices regression competition. The train.csv file is the training data. The test.csv file is the data on which
+the algorithm is run to predict results. These results are stored in HousePricesSubmission.csv file which when uploaded on
+kaggle gives a score. The gender_submission.csv file is an example file to upload as submission.
+
+Plan of Attack Step 1 - Exploratory Data Analysis:
+Before we start anything, we must identify if all data given to us serve as predictors for the outcome. For this, we use
+exploratory data analysis. We take each feature and using the various plot libraries available in Python, we see the
+significance of each feature on the outcome. We also check the test data to see if there is any data that is not present
+in the training data.
+Since there are a lot of features to manually type out here, I will simply mention that the same process was used. Categorical
+features that were seen to have a higher impact on the prediction were assigned a higher number than the others. For example, in
+the functional category, Typ3 was seen to be predicting higher house prices followed by Maj2 and then everything else roughly
+around the same. Hence, Typ3 was assigned the number 3, Maj2 2 and everything else as 1.
+
+Now, we have a lot of useful information and we can move onto step 2.
+
+Plan of Attack Step 2 - Data Preprocessing:
+Again, because of the presence of a lot of features, I will simply mention that the usual techniques were used. For features with
+20% or less missing data, either the most occuring value (for categorical features) or the mean of values (for numeric features)
+was used to fill up the missing entries. For features with more than 20% missing data, these were deleted.
+
+Plan of Attack Step 3 - Encoding Categorical Data:
+Encoding categorical data was done similar to past projects, based on trends observed in Exploratory Data Analysis. However, I
+made a very crucial mistake here that has not been fixed yet. I used one-hot encoding for certain features but forgot to take
+into account how it would change the column indices. This is why my score is so low. This will take a lot of time to fix so
+its on hold for now.
+
+Plan of Attack Step 4 - Preprocessing and Encoding Test Data:
+Similar to what we did for the train.csv data, we follow the exact same approach to convert the data from test.csv into proper
+formatting. I prefer to do this before moving on to selecting the model because I want to get the boring stuff over with once
+and for all.
+
+Plan of Attack Step 5 - Splitting the dataset into the training and test set
+An 80-20 standard split was used to split the data into training and test set.
+
+Plan of Attack Step 6 - Feature Scale the data
+Since this is a regression problem, there is no need to feature scale the data since the weights that will be assigned will take care of
+any biases on features.
+
+Plan of Attack Step 7 - Train multiple classification models on the data and pick the one with the highest accuracy
+These classification models were used - Logistic Regression, kNN, SVM, Naive Bayes and Random Forest. The confusion matrices
+were constructed for each of these and it was observed that Random Forest gave the highest accuracy. Hence, that was chosen to predict
+data on the test.csv file
+
+Plan of Attack Step 8 - Maximize learning
+With Random Forest chosen, it was now trained on 100% of the training data. Because the existing classifier was trained on only 80% of
+data hence to get better results, it needed to be trained on all of the available data.
+
+Plan of Attack Step 9 - Run the classifier on the test.csv data and get results
+The Random Forest classifier was now run on the test.csv data and the results were stored in the TitanicSubmission.csv file, ready for
+submission to kaggle. The result was an impressive accuracy of 78%.
 
