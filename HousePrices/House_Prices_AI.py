@@ -9,19 +9,21 @@ from sklearn.preprocessing import OneHotEncoder #Import class to perform one-hot
 from sklearn.preprocessing import LabelEncoder #Import class to perform label encoding
 from sklearn.model_selection import train_test_split #Import function to split data into training and test set
 from sklearn.preprocessing import StandardScaler #Import class to perform feature scaling
-from sklearn.linear_model import LogisticRegression #Import class to implement logistic regression
-from sklearn.metrics import confusion_matrix, accuracy_score #Import methods to implement confusion matrix and calculate accuracy
-from sklearn.neighbors import KNeighborsClassifier #Import class to implement kNN
+from sklearn.linear_model import LinearRegression #Import class to implement linear regression
+from sklearn.ensemble import RandomForestRegressor #Import class to implement random forest regression
 from sklearn.svm import SVC #Import class to implement SVM
 from sklearn.naive_bayes import GaussianNB #Import class to implement Naive Bayes
 from sklearn.ensemble import RandomForestClassifier #Import class to implement Random Forest Classification
 from scipy import stats #Import stats to help with data preprocessing
+from sklearn.metrics import r2_score
 
 #Importing the dataset
 dataset = pd.read_csv('train.csv')
+datasettest = pd.read_csv('test.csv')
 #Ignoring the Id column since a simple numbering from 1 onwards is not helpful in predicting data
-X = dataset.iloc[:, 1:].values
+X = dataset.iloc[:, 1:-1].values
 y = dataset.iloc[:, -1].values
+Xtest = datasettest.iloc[:, 1:].values
 
 #Exploratory Data Analysis
 #Since there are a lot of features to explore one by one, we divide into numeric and categorical features. Starting with numeric
@@ -127,12 +129,10 @@ sns.barplot(x = dataset['KitchenQual'], y = dataset['SalePrice'], data = dataset
 #Based on this plot, Ex as 1, everything else 0
 sns.barplot(x = dataset['Functional'], y = dataset['SalePrice'], data = dataset)
 #Based on this plot, Typ as 3, Maj2 as 1, everything else 2
-sns.barplot(x = dataset['FireplaceQu'], y = dataset['SalePrice'], data = dataset)
-#Based on this plot, Ex as 1, everything else 0
 sns.barplot(x = dataset['GarageType'], y = dataset['SalePrice'], data = dataset)
 #Based on this plot, BuiltIn as 3, Attchd as 2, everything else 1
 sns.barplot(x = dataset['GarageFinish'], y = dataset['SalePrice'], data = dataset)
-#Based on this plot, Fin as 3, RFn as 2, Unf as 0
+#Based on this plot, Fin as 3, RFn as 2, Unf as 1
 sns.barplot(x = dataset['GarageQual'], y = dataset['SalePrice'], data = dataset)
 #Based on this plot, Gd as 3, TA as 2, everything else 1
 sns.barplot(x = dataset['GarageCond'], y = dataset['SalePrice'], data = dataset)
@@ -144,7 +144,7 @@ sns.barplot(x = dataset['SaleType'], y = dataset['SalePrice'], data = dataset)
 sns.barplot(x = dataset['SaleCondition'], y = dataset['SalePrice'], data = dataset)
 #Based on this plot, Abnorml, Partial as 1, everything else 0
 #Since the data is not too large, we won't exclude any features. Reassigning X and y with the new dataset
-X = dataset.iloc[:, 1:].values
+X = dataset.iloc[:, 1:-1].values
 y = dataset.iloc[:, -1].values
 
 #Data Preprocessing
@@ -282,53 +282,667 @@ for data in X[:, 5]:
     else:
         lotshape.append(1)
 X[:, 5] = np.asarray(lotshape)
-ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [6])], remainder = 'passthrough', sparse_threshold = 0)
-X = np.array(ct.fit_transform(X))
 utilities = []
-for data in X[:, 7]:
+for data in X[:, 10]:
     if data == 'AllPub':
         utilities.append(1)
     else:
         utilities.append(0)
-X[:, 7] = np.asarray(utilities)
-ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [8])], remainder = 'passthrough', sparse_threshold = 0)
-X = np.array(ct.fit_transform(X))
-ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [9])], remainder = 'passthrough', sparse_threshold = 0)
-X = np.array(ct.fit_transform(X))
+X[:, 10] = np.asarray(utilities)
 neighborhood = []
-for data in X[:, 10]:
+for data in X[:, 19]:
     if data == 'NoRidge' or data == 'NridgHt' or data == 'StoneBr':
         neighborhood.append(1)
     else:
         neighborhood.append(0)
-X[:, 10] = np.asarray(neighborhood)
+X[:, 19] = np.asarray(neighborhood)
 condition1 = []
-for data in X[:, 11]:
+for data in X[:, 20]:
     if data == 'PosN' or data == 'RRNn' or data == 'PosA':
         condition1.append(3)
     elif data == 'Norm' or data == 'RRAn' or data == 'RRNe':
         condition1.append(2)
     else:
         condition1.append(1)
-X[:, 11] = np.asarray(condition1)
+X[:, 20] = np.asarray(condition1)
 condition2 = []
-for data in X[:, 12]:
+for data in X[:, 21]:
     if data == 'PosA' or data == 'PosN':
         condition2.append(1)
     else:
         condition2.append(0)
-X[:, 12] = np.asarray(condition2)
+X[:, 21] = np.asarray(condition2)
 bldgtype = []
-for data in X[:, 13]:
+for data in X[:, 22]:
     if data == '1Fam' or data == 'TwnhsE':
         bldgtype.append(1)
     else:
         bldgtype.append(0)
-X[:, 13] = np.asarray(bldgtype)
+X[:, 22] = np.asarray(bldgtype)
 housestyle = []
-for data in X[:, 14]:
+for data in X[:, 23]:
     if data == '2Story':
         housestyle.append(1)
     else:
         housestyle.append(0)
-X[:, 14] = np.asarray(housestyle)
+X[:, 23] = np.asarray(housestyle)
+roofstyle = []
+for data in X[:, 28]:
+    if data == 'Shed':
+        roofstyle.append(1)
+    else:
+        roofstyle.append(0)
+X[:, 28] = np.asarray(roofstyle)
+roofmatl = []
+for data in X[:, 29]:
+    if data == 'WdShake' or data == 'Membran':
+        roofmatl.append(1)
+    else:
+        roofmatl.append(0)
+X[:, 29] = np.asarray(roofmatl)
+exterior1st = []
+for data in X[:, 30]:
+    if data == 'VinylSd' or data == 'CemntBd' or data == 'Stone' or data == 'ImStucc':
+        exterior1st.append(1)
+    else:
+        exterior1st.append(0)
+X[:, 30] = np.asarray(exterior1st)
+exterior2nd = []
+for data in X[:, 31]:
+    if data == 'Other':
+        exterior2nd.append(1)
+    else:
+        exterior2nd.append(0)
+X[:, 31] = np.asarray(exterior2nd)
+masvnrtype = []
+for data in X[:, 32]:
+    if data == 'Stone':
+        masvnrtype.append(1)
+    else:
+        masvnrtype.append(0)
+X[:, 32] = np.asarray(masvnrtype)
+exterqual = []
+for data in X[:, 34]:
+    if data == 'Ex':
+        exterqual.append(1)
+    else:
+        exterqual.append(0)
+X[:, 34] = np.asarray(exterqual)
+extercond = []
+for data in X[:, 35]:
+    if data == 'Po' or data == 'Fa':
+        extercond.append(0)
+    else:
+        extercond.append(1)
+X[:, 35] = np.asarray(extercond)
+foundation = []
+for data in X[:, 36]:
+    if data == 'PConc' or data == 'Wood' or data == 'Stone':
+        foundation.append(1)
+    else:
+        foundation.append(0)
+X[:, 36] = np.asarray(foundation)
+bsmtqual = []
+for data in X[:, 37]:
+    if data == 'Ex':
+        bsmtqual.append(1)
+    else:
+        bsmtqual.append(0)
+X[:, 37] = np.asarray(bsmtqual)
+bsmtcond = []
+for data in X[:, 38]:
+    if data == 'TA' or data == 'Gd':
+        bsmtcond.append(1)
+    else:
+        bsmtcond.append(0)
+X[:, 38] = np.asarray(bsmtcond)
+bsmtexposure = []
+for data in X[:, 39]:
+    if data == 'Gd':
+        bsmtexposure.append(1)
+    else:
+        bsmtexposure.append(0)
+X[:, 39] = np.asarray(bsmtexposure)
+bsmtfintype1 = []
+for data in X[:, 40]:
+    if data == 'GLQ':
+        bsmtfintype1.append(1)
+    else:
+        bsmtfintype1.append(0)
+X[:, 40] = np.asarray(bsmtfintype1)
+heating = []
+for data in X[:, 51]:
+    if data == 'GasA' or data == 'GasW':
+        heating.append(1)
+    else:
+        heating.append(0)
+X[:, 51] = np.asarray(heating)
+heatingqc = []
+for data in X[:, 52]:
+    if data == 'Ex':
+        heatingqc.append(1)
+    else:
+        heatingqc.append(0)
+X[:, 52] = np.asarray(heatingqc)
+centralair = []
+for data in X[:, 53]:
+    if data == 'Y':
+        centralair.append(1)
+    else:
+        centralair.append(0)
+X[:, 53] = np.asarray(centralair)
+electrical = []
+for data in X[:, 54]:
+    if data == 'SBrkr':
+        electrical.append(1)
+    else:
+        electrical.append(0)
+X[:, 54] = np.asarray(electrical)
+kitchenqual = []
+for data in X[:, 65]:
+    if data == 'Ex':
+        kitchenqual.append(1)
+    else:
+        kitchenqual.append(0)
+X[:, 65] = np.asarray(kitchenqual)
+functional = []
+for data in X[:, 67]:
+    if data == 'Typ':
+        functional.append(3)
+    elif data == 'Maj2':
+        functional.append(1)
+    else:
+        functional.append(2)
+X[:, 67] = np.asarray(functional)
+garagetype = []
+for data in X[:, 69]:
+    if data == 'BuiltIn':
+        garagetype.append(3)
+    elif data == 'Attchd':
+        garagetype.append(2)
+    else:
+        garagetype.append(1)
+X[:, 69] = np.asarray(garagetype)
+garagefinish = []
+for data in X[:, 71]:
+    if data == 'Fin':
+        garagefinish.append(3)
+    elif data == 'RFn':
+        garagefinish.append(2)
+    else:
+        garagefinish.append(1)
+X[:, 71] = np.asarray(garagefinish)
+garagequal = []
+for data in X[:, 74]:
+    if data == 'Gd':
+        garagequal.append(3)
+    elif data == 'TA':
+        garagequal.append(2)
+    else:
+        garagequal.append(1)
+X[:, 74] = np.asarray(garagequal)
+garagecond = []
+for data in X[:, 75]:
+    if data == 'Gd' or data == 'TA':
+        garagecond.append(1)
+    else:
+        garagecond.append(0)
+X[:, 75] = np.asarray(garagecond)
+paveddrive = []
+for data in X[:, 76]:
+    if data == 'Y':
+        paveddrive.append(1)
+    else:
+        paveddrive.append(0)
+X[:, 76] = np.asarray(paveddrive)
+saletype = []
+for data in X[:, 86]:
+    if data == 'Con' or data == 'New':
+        saletype.append(3)
+    elif data == 'ConLI' or data == 'CWD':
+        saletype.append(2)
+    else:
+        saletype.append(1)
+X[:, 86] = np.asarray(saletype)
+salecond = []
+for data in X[:, 87]:
+    if data == 'Abnorml' or data == 'Partial':
+        salecond.append(1)
+    else:
+        salecond.append(0)
+X[:, 87] = np.asarray(salecond)
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [6])], remainder = 'passthrough', sparse_threshold = 0)
+X = np.array(ct.fit_transform(X))
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [11])], remainder = 'passthrough', sparse_threshold = 0)
+X = np.array(ct.fit_transform(X))
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [16])], remainder = 'passthrough', sparse_threshold = 0)
+X = np.array(ct.fit_transform(X))
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [42])], remainder = 'passthrough', sparse_threshold = 0)
+X = np.array(ct.fit_transform(X))
+#Verifying if we have any missing data still
+print(np.isnan(np.min(X)))
+#The answer is no
+
+#Now making sure our test data is also in a proper format by following similar approaches
+missing_data = datasettest.isnull().sum() #Identify amount of missing data
+print(missing_data)
+#Handling missing data in test.csv the same way
+print(stats.mode(Xtest[:, 1]))
+for index, val in enumerate(Xtest[:, 1]):
+    if pd.isnull(Xtest[index, 1]):
+        Xtest[index, 1] = 'RL'
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(Xtest[:, [2]])
+Xtest[:, [2]] = imputer.transform(Xtest[:, [2]])
+print(stats.mode(Xtest[:, 8]))
+for index, val in enumerate(Xtest[:, 8]):
+    if pd.isnull(Xtest[index, 8]):
+        Xtest[index, 8] = 'AllPub'
+print(stats.mode(Xtest[:, 22]))
+for index, val in enumerate(Xtest[:, 22]):
+    if pd.isnull(Xtest[index, 22]):
+        Xtest[index, 22] = 'VinylSd'
+print(stats.mode(Xtest[:, 23]))
+for index, val in enumerate(Xtest[:, 23]):
+    if pd.isnull(Xtest[index, 23]):
+        Xtest[index, 23] = 'VinylSd'
+print(stats.mode(Xtest[:, 24]))
+for index, val in enumerate(Xtest[:, 24]):
+    if pd.isnull(Xtest[index, 24]):
+        Xtest[index, 24] = 'None'
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(Xtest[:, [25]])
+Xtest[:, [25]] = imputer.transform(Xtest[:, [25]])
+print(stats.mode(Xtest[:, 29]))
+for index, val in enumerate(Xtest[:, 29]):
+    if pd.isnull(Xtest[index, 29]):
+        Xtest[index, 29] = 'TA'
+print(stats.mode(Xtest[:, 30]))
+for index, val in enumerate(Xtest[:, 30]):
+    if pd.isnull(Xtest[index, 30]):
+        Xtest[index, 30] = 'TA'
+print(stats.mode(Xtest[:, 31]))
+for index, val in enumerate(Xtest[:, 31]):
+    if pd.isnull(Xtest[index, 31]):
+        Xtest[index, 31] = 'No'
+print(stats.mode(Xtest[:, 32]))
+for index, val in enumerate(Xtest[:, 32]):
+    if pd.isnull(Xtest[index, 32]):
+        Xtest[index, 32] = 'GLQ'
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(Xtest[:, [33]])
+Xtest[:, [33]] = imputer.transform(Xtest[:, [33]])
+print(stats.mode(Xtest[:, 34]))
+for index, val in enumerate(Xtest[:, 34]):
+    if pd.isnull(Xtest[index, 34]):
+        Xtest[index, 34] = 'Unf'
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(Xtest[:, [35]])
+Xtest[:, [35]] = imputer.transform(Xtest[:, [35]])
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(Xtest[:, [36]])
+Xtest[:, [36]] = imputer.transform(Xtest[:, [36]])
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(Xtest[:, [37]])
+Xtest[:, [37]] = imputer.transform(Xtest[:, [37]])
+print(stats.mode(Xtest[:, 46]))
+for index, val in enumerate(Xtest[:, 46]):
+    if pd.isnull(Xtest[index, 46]):
+        Xtest[index, 46] = 0
+print(stats.mode(Xtest[:, 47]))
+for index, val in enumerate(Xtest[:, 47]):
+    if pd.isnull(Xtest[index, 47]):
+        Xtest[index, 47] = 0
+print(stats.mode(Xtest[:, 52]))
+for index, val in enumerate(Xtest[:, 52]):
+    if pd.isnull(Xtest[index, 52]):
+        Xtest[index, 52] = 'TA'
+print(stats.mode(Xtest[:, 54]))
+for index, val in enumerate(Xtest[:, 54]):
+    if pd.isnull(Xtest[index, 54]):
+        Xtest[index, 54] = 'Typ'
+print(stats.mode(Xtest[:, 57]))
+for index, val in enumerate(Xtest[:, 57]):
+    if pd.isnull(Xtest[index, 57]):
+        Xtest[index, 57] = 'Attchd'
+print(stats.mode(Xtest[:, 58]))
+for index, val in enumerate(Xtest[:, 58]):
+    if pd.isnull(Xtest[index, 58]):
+        Xtest[index, 58] = 2005
+print(stats.mode(Xtest[:, 59]))
+for index, val in enumerate(Xtest[:, 59]):
+    if pd.isnull(Xtest[index, 59]):
+        Xtest[index, 59] = 'Unf'
+print(stats.mode(Xtest[:, 60]))
+for index, val in enumerate(Xtest[:, 60]):
+    if pd.isnull(Xtest[index, 60]):
+        Xtest[index, 60] = 2
+imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer.fit(Xtest[:, [61]])
+Xtest[:, [61]] = imputer.transform(Xtest[:, [61]])
+print(stats.mode(Xtest[:, 62]))
+for index, val in enumerate(Xtest[:, 62]):
+    if pd.isnull(Xtest[index, 62]):
+        Xtest[index, 62] = 'TA'
+print(stats.mode(Xtest[:, 63]))
+for index, val in enumerate(Xtest[:, 63]):
+    if pd.isnull(Xtest[index, 63]):
+        Xtest[index, 63] = 'TA'
+print(stats.mode(Xtest[:, 77]))
+for index, val in enumerate(Xtest[:, 77]):
+    if pd.isnull(Xtest[index, 77]):
+        Xtest[index, 77] = 'WD'
+Xtest = np.delete(Xtest, 5, 1)
+Xtest = np.delete(Xtest, 55, 1)
+Xtest = np.delete(Xtest, 69, 1)
+Xtest = np.delete(Xtest, 69, 1)
+Xtest = np.delete(Xtest, 69, 1)
+
+#Encoding categorical data
+#Encode data based on what we identified in exploratory data analysis
+mszoning = []
+for data in Xtest[:, 1]:
+    if data == 'FV':
+        mszoning.append(5)
+    elif data == 'RL':
+        mszoning.append(4)
+    elif data == 'RH':
+        mszoning.append(3)
+    elif data == 'RM':
+        mszoning.append(2)
+    else:
+        mszoning.append(1)
+Xtest[:, 1] = np.asarray(mszoning)
+street = []
+for data in Xtest[:, 4]:
+    if data == 'Pave':
+        street.append(1)
+    else:
+        street.append(0)
+Xtest[:, 4] = np.asarray(street)
+lotshape = []
+for data in Xtest[:, 5]:
+    if data == 'Reg':
+        lotshape.append(0)
+    else:
+        lotshape.append(1)
+Xtest[:, 5] = np.asarray(lotshape)
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [6])], remainder = 'passthrough', sparse_threshold = 0)
+Xtest = np.array(ct.fit_transform(Xtest))
+utilities = []
+for data in Xtest[:, 10]:
+    if data == 'AllPub':
+        utilities.append(1)
+    else:
+        utilities.append(0)
+Xtest[:, 10] = np.asarray(utilities)
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [11])], remainder = 'passthrough', sparse_threshold = 0)
+Xtest = np.array(ct.fit_transform(Xtest))
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [16])], remainder = 'passthrough', sparse_threshold = 0)
+Xtest = np.array(ct.fit_transform(Xtest))
+neighborhood = []
+for data in Xtest[:, 19]:
+    if data == 'NoRidge' or data == 'NridgHt' or data == 'StoneBr':
+        neighborhood.append(1)
+    else:
+        neighborhood.append(0)
+Xtest[:, 19] = np.asarray(neighborhood)
+condition1 = []
+for data in Xtest[:, 20]:
+    if data == 'PosN' or data == 'RRNn' or data == 'PosA':
+        condition1.append(3)
+    elif data == 'Norm' or data == 'RRAn' or data == 'RRNe':
+        condition1.append(2)
+    else:
+        condition1.append(1)
+Xtest[:, 20] = np.asarray(condition1)
+condition2 = []
+for data in Xtest[:, 21]:
+    if data == 'PosA' or data == 'PosN':
+        condition2.append(1)
+    else:
+        condition2.append(0)
+Xtest[:, 21] = np.asarray(condition2)
+bldgtype = []
+for data in Xtest[:, 22]:
+    if data == '1Fam' or data == 'TwnhsE':
+        bldgtype.append(1)
+    else:
+        bldgtype.append(0)
+Xtest[:, 22] = np.asarray(bldgtype)
+housestyle = []
+for data in Xtest[:, 23]:
+    if data == '2Story':
+        housestyle.append(1)
+    else:
+        housestyle.append(0)
+Xtest[:, 23] = np.asarray(housestyle)
+roofstyle = []
+for data in Xtest[:, 28]:
+    if data == 'Shed':
+        roofstyle.append(1)
+    else:
+        roofstyle.append(0)
+Xtest[:, 28] = np.asarray(roofstyle)
+roofmatl = []
+for data in Xtest[:, 29]:
+    if data == 'WdShake' or data == 'Membran':
+        roofmatl.append(1)
+    else:
+        roofmatl.append(0)
+Xtest[:, 29] = np.asarray(roofmatl)
+exterior1st = []
+for data in Xtest[:, 30]:
+    if data == 'VinylSd' or data == 'CemntBd' or data == 'Stone' or data == 'ImStucc':
+        exterior1st.append(1)
+    else:
+        exterior1st.append(0)
+Xtest[:, 30] = np.asarray(exterior1st)
+#Too many features. Reached my limit. Using OHE from here on out
+exterior2nd = []
+for data in Xtest[:, 31]:
+    if data == 'Other':
+        exterior2nd.append(1)
+    else:
+        exterior2nd.append(0)
+Xtest[:, 31] = np.asarray(exterior2nd)
+masvnrtype = []
+for data in Xtest[:, 32]:
+    if data == 'Stone':
+        masvnrtype.append(1)
+    else:
+        masvnrtype.append(0)
+Xtest[:, 32] = np.asarray(masvnrtype)
+exterqual = []
+for data in Xtest[:, 34]:
+    if data == 'Ex':
+        exterqual.append(1)
+    else:
+        exterqual.append(0)
+Xtest[:, 34] = np.asarray(exterqual)
+extercond = []
+for data in Xtest[:, 35]:
+    if data == 'Po' or data == 'Fa':
+        extercond.append(0)
+    else:
+        extercond.append(1)
+Xtest[:, 35] = np.asarray(extercond)
+foundation = []
+for data in Xtest[:, 36]:
+    if data == 'PConc' or data == 'Wood' or data == 'Stone':
+        foundation.append(1)
+    else:
+        foundation.append(0)
+Xtest[:, 36] = np.asarray(foundation)
+bsmtqual = []
+for data in Xtest[:, 37]:
+    if data == 'Ex':
+        bsmtqual.append(1)
+    else:
+        bsmtqual.append(0)
+Xtest[:, 37] = np.asarray(bsmtqual)
+bsmtcond = []
+for data in Xtest[:, 38]:
+    if data == 'TA' or data == 'Gd':
+        bsmtcond.append(1)
+    else:
+        bsmtcond.append(0)
+Xtest[:, 38] = np.asarray(bsmtcond)
+bsmtexposure = []
+for data in Xtest[:, 39]:
+    if data == 'Gd':
+        bsmtexposure.append(1)
+    else:
+        bsmtexposure.append(0)
+Xtest[:, 39] = np.asarray(bsmtexposure)
+bsmtfintype1 = []
+for data in Xtest[:, 40]:
+    if data == 'GLQ':
+        bsmtfintype1.append(1)
+    else:
+        bsmtfintype1.append(0)
+Xtest[:, 40] = np.asarray(bsmtfintype1)
+ct = ColumnTransformer(transformers = [('encoder', OneHotEncoder(), [42])], remainder = 'passthrough', sparse_threshold = 0)
+Xtest = np.array(ct.fit_transform(Xtest))
+heating = []
+for data in Xtest[:, 51]:
+    if data == 'GasA' or data == 'GasW':
+        heating.append(1)
+    else:
+        heating.append(0)
+Xtest[:, 51] = np.asarray(heating)
+heatingqc = []
+for data in Xtest[:, 52]:
+    if data == 'Ex':
+        heatingqc.append(1)
+    else:
+        heatingqc.append(0)
+Xtest[:, 52] = np.asarray(heatingqc)
+centralair = []
+for data in Xtest[:, 53]:
+    if data == 'Y':
+        centralair.append(1)
+    else:
+        centralair.append(0)
+Xtest[:, 53] = np.asarray(centralair)
+electrical = []
+for data in Xtest[:, 54]:
+    if data == 'SBrkr':
+        electrical.append(1)
+    else:
+        electrical.append(0)
+Xtest[:, 54] = np.asarray(electrical)
+kitchenqual = []
+for data in Xtest[:, 65]:
+    if data == 'Ex':
+        kitchenqual.append(1)
+    else:
+        kitchenqual.append(0)
+Xtest[:, 65] = np.asarray(kitchenqual)
+functional = []
+for data in Xtest[:, 67]:
+    if data == 'Typ':
+        functional.append(3)
+    elif data == 'Maj2':
+        functional.append(1)
+    else:
+        functional.append(2)
+Xtest[:, 67] = np.asarray(functional)
+garagetype = []
+for data in Xtest[:, 69]:
+    if data == 'BuiltIn':
+        garagetype.append(3)
+    elif data == 'Attchd':
+        garagetype.append(2)
+    else:
+        garagetype.append(1)
+Xtest[:, 69] = np.asarray(garagetype)
+garagefinish = []
+for data in Xtest[:, 71]:
+    if data == 'Fin':
+        garagefinish.append(3)
+    elif data == 'RFn':
+        garagefinish.append(2)
+    else:
+        garagefinish.append(1)
+Xtest[:, 71] = np.asarray(garagefinish)
+garagequal = []
+for data in Xtest[:, 74]:
+    if data == 'Gd':
+        garagequal.append(3)
+    elif data == 'TA':
+        garagequal.append(2)
+    else:
+        garagequal.append(1)
+Xtest[:, 74] = np.asarray(garagequal)
+garagecond = []
+for data in Xtest[:, 75]:
+    if data == 'Gd' or data == 'TA':
+        garagecond.append(1)
+    else:
+        garagecond.append(0)
+Xtest[:, 75] = np.asarray(garagecond)
+paveddrive = []
+for data in Xtest[:, 76]:
+    if data == 'Y':
+        paveddrive.append(1)
+    else:
+        paveddrive.append(0)
+Xtest[:, 76] = np.asarray(paveddrive)
+saletype = []
+for data in Xtest[:, 86]:
+    if data == 'Con' or data == 'New':
+        saletype.append(3)
+    elif data == 'ConLI' or data == 'CWD':
+        saletype.append(2)
+    else:
+        saletype.append(1)
+Xtest[:, 86] = np.asarray(saletype)
+salecond = []
+for data in Xtest[:, 87]:
+    if data == 'Abnorml' or data == 'Partial':
+        salecond.append(1)
+    else:
+        salecond.append(0)
+Xtest[:, 87] = np.asarray(salecond)
+#Verifying if we have any missing data still
+print(np.isnan(np.min(Xtest)))
+#The answer is no
+
+# Splitting the dataset into the Training set and Test set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+
+# Training the Multiple Linear Regression model on the Training set
+regressor = LinearRegression()
+regressor.fit(X_train, y_train)
+
+# Predicting the Test set results
+y_pred = regressor.predict(X_test)
+np.set_printoptions(precision=2)
+
+# Evaluating the Model Performance
+r2scorelinreg = r2_score(y_test, y_pred)
+
+regressor = RandomForestRegressor(n_estimators = 500)
+regressor.fit(X_train, y_train)
+
+# Predicting the Test set results
+y_pred = regressor.predict(X_test)
+np.set_printoptions(precision=2)
+
+# Evaluating the Model Performance
+from sklearn.metrics import r2_score
+r2scorerf = r2_score(y_test, y_pred)
+
+#Since linear regression gives the highest accuracy, we will use it to predict results in the test.csv file
+
+#Training the linear regression model on the whole dataset now to maximize learning
+regressorlinreg= LinearRegression()
+regressorlinreg.fit(X, y)
+
+#Applying Random Forest
+y_predfinal = regressorlinreg.predict(Xtest)
+
+#Convert to csv
+df = pd.DataFrame({"Id" : y_predfinal, "SalePrice" : y_predfinal})
+df.to_csv("HousePricesSubmission.csv", index=False)
