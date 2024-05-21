@@ -1,0 +1,55 @@
+RESULT - 78%
+Files Description:
+The Spaceship_Titanic_AI.py file contains code to execute a machine learning algorithm on the datasets downloaded from kaggle.com,
+specifically in the spaceship titanic competition. The train.csv file is the training data. The test.csv file is the data on which
+the algorithm is run to predict results. These results are stored in SpaceshipSubmission.csv file which when uploaded on
+kaggle gives a score.
+
+Plan of Attack Step 1 - Exploratory Data Analysis:
+Before we start anything, we must identify if all data given to us serve as predictors for the outcome. For this, we use
+exploratory data analysis. We take each feature and using the various plot libraries available in Python, we see the
+significance of each feature on the outcome. We also check the test data to see if there is any data that is not present
+in the training data.
+1. HomePlanet - Through EDA, it was found that passengers from Europa are more likely to be transported than those from Mars and lastly, those from Earth
+Hence, these can be assigned numbers 3, 2 and 1 respectively.
+2. CryoSleep - Through EDA, it was found that passengers who were in Cryo Sleep are more likely to be transported than those who were not. Hence, 1 and 0.
+3. Cabin - For this category, the whole string of the cabin does not make sense. However, the last letter indicating port or starboard might be a useful
+predictor. Hence, EDA was applied to the last string and it was found that there wasn't a significant trend so one-hot encoding method will be used here.
+4. Destination - Through EDA, it was found that passengers going to Cancri e are most likely to be transported than the rest. Hence, 1 and 0.
+5. VIP - Through EDA, it was found that passengers without VIP status are more likely to be transported than those who are not. Hence, 1 and 0.
+6. Name - This has no bearing on the outcome so this feature was removed.
+
+Now, we have a lot of useful information and we can move onto step 2.
+
+Plan of Attack Step 2 - Data Preprocessing:
+To handle missing data, similar techniques used in previous projects were used. For the categorical features, the most occuring value in
+the dataset was used. For numeric features, the mean of the values was used. The name column was deleted since it is not a useful feature
+in predicting the outcome.
+
+Plan of Attack Step 3 - Encoding Categorical Data:
+Categorical data was encoded into numbers via the EDA techniques described earlier.
+
+Plan of Attack Step 4 - Preprocessing and Encoding Test Data:
+Similar to what we did for the train.csv data, we follow the exact same approach to convert the data from test.csv into proper
+formatting. I prefer to do this before moving on to selecting the model because I want to get the boring stuff over with once
+and for all.
+
+Plan of Attack Step 5 - Splitting the dataset into the training and test set
+An 80-20 standard split was used to split the data into training and test set.
+
+Plan of Attack Step 6 - Feature Scale the data
+The fit_transform method was used to feature scale training data but only transform method was used to feature scale test data
+to prevent information leakage. The test.csv data was feature scaled too.
+
+Plan of Attack Step 7 - Train multiple classification models on the data and pick the one with the highest accuracy
+These classification models were used - Logistic Regression, kNN, SVM, Naive Bayes and Random Forest. The confusion matrices
+were constructed for each of these and it was observed that SVM gave the highest accuracy. Hence, that was chosen to predict
+data on the test.csv file
+
+Plan of Attack Step 8 - Maximize learning
+With SVM chosen, it was now trained on 100% of the training data. Because the existing classifier was trained on only 80% of
+data hence to get better results, it needed to be trained on all of the available data.
+
+Plan of Attack Step 9 - Run the classifier on the test.csv data and get results
+The SVM classifier was now run on the test.csv data and the results were stored in the SpaceshipSubmission.csv file, ready for
+submission to kaggle. The result was an accuracy of 78%.
