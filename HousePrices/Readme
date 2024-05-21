@@ -41,15 +41,14 @@ Since this is a regression problem, there is no need to feature scale the data s
 any biases on features.
 
 Plan of Attack Step 7 - Train multiple classification models on the data and pick the one with the highest accuracy
-These classification models were used - Logistic Regression, kNN, SVM, Naive Bayes and Random Forest. The confusion matrices
-were constructed for each of these and it was observed that Random Forest gave the highest accuracy. Hence, that was chosen to predict
-data on the test.csv file
+These classification models were used - Linear Regression and Random Forest. The r2 score was calculated for each of these
+and it was observed that Random Forest gave the highest accuracy. Hence, that was chosen to predict data on the test.csv file
 
 Plan of Attack Step 8 - Maximize learning
-With Random Forest chosen, it was now trained on 100% of the training data. Because the existing classifier was trained on only 80% of
+With Random Forest chosen, it was now trained on 100% of the training data. Because the existing regressor was trained on only 80% of
 data hence to get better results, it needed to be trained on all of the available data.
 
 Plan of Attack Step 9 - Run the classifier on the test.csv data and get results
-The Random Forest classifier was now run on the test.csv data and the results were stored in the TitanicSubmission.csv file, ready for
-submission to kaggle. The result was an impressive accuracy of 78%.
+The Random Forest classifier was now run on the test.csv data and the results were stored in the HousePricesSubmission.csv file, ready for
+submission to kaggle. The result was an 15% which like I mentioned is due to me messing up the one-hot encoding from before.
 
